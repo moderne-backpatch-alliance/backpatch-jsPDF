@@ -1,6 +1,6 @@
 {
   "name": "jspdf",
-  "version": "2.5.3-backpatch-00003",
+  "version": "2.5.3-backpatch-00004",
   "homepage": "https://github.com/mrrio/jspdf",
   "description": "PDF Document creation from JavaScript",
   "main": "dist/jspdf.node.min.js",
