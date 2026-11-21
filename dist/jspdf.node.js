@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00009 Built on 2024-09-17T13:29:57.860Z
+ * Version 2.5.3-backpatch-00010 Built on 2024-09-17T13:29:57.860Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6887,7 +6887,7 @@ jsPDF.API = {
  * @type {string}
  * @memberof jsPDF#
  */
-jsPDF.version = "2.5.3-backpatch-00009";
+jsPDF.version = "2.5.3-backpatch-00010";
 
 /* global jsPDF */
 
@@ -11215,6 +11215,9 @@ var AcroForm = jsPDF.AcroForm;
               getVerticalCoordinateString(anno.bounds.y + anno.bounds.h) +
               "] ";
             var color = anno.color || "#000000";
+            var defaultStyle =
+              "font: Helvetica,sans-serif 12.0pt; text-align:left; color:#" +
+              color;
             line =
               "<</Type /Annot /Subtype /" +
               "FreeText" +
@@ -11223,10 +11226,7 @@ var AcroForm = jsPDF.AcroForm;
               "/Contents (" +
               escape(encryptor(anno.contents)) +
               ")";
-            line +=
-              " /DS(font: Helvetica,sans-serif 12.0pt; text-align:left; color:#" +
-              color +
-              ")";
+            line += " /DS(" + escape(encryptor(defaultStyle)) + ")";
             line += " /Border [0 0 0]";
             line += " >>";
             this.internal.write(line);
