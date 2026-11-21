@@ -74,4 +74,25 @@ describe("Module: BMPSupport", () => {
 
     comparePdf(doc.output(), "bmp32p.pdf", "addimage");
   });
+
+  it("rejects dimensions whose pixel buffer exceeds 512MB", () => {
+    // Header only, with dimensions too large to allocate at all: smaller ones
+    // make the unfixed decoder allocate and JPEG-encode a huge image instead.
+    const header = new Uint8Array(54);
+    const view = new DataView(header.buffer);
+    header[0] = 0x42;
+    header[1] = 0x4d;
+    view.setUint32(2, 54, true);
+    view.setUint32(10, 54, true);
+    view.setUint32(14, 40, true);
+    view.setUint32(18, 0xffffffff, true);
+    view.setInt32(22, 0x7fffffff, true);
+    view.setUint16(26, 1, true);
+    view.setUint16(28, 24, true);
+    const doc = new jsPDF();
+    expect(() => doc.addImage(header, "BMP", 0, 0, 10, 10)).toThrowError(
+      Error,
+      "Image dimensions exceed 512MB, which is too large."
+    );
+  });
 });
