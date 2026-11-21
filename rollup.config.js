@@ -68,6 +68,15 @@ const umd = {
     commonjs(),
     RollupPluginPreprocess({ context: { MODULE_FORMAT: "umd" } }),
     replaceVersion(),
+    // fast-png and its dependencies ship ES2022; transpile them for the ES5
+    // UMD bundle and for terser 4, which cannot parse class fields.
+    babel({
+      babelHelpers: "bundled",
+      babelrc: false,
+      configFile: false,
+      include: ["node_modules/{fast-png,iobuffer,pako}/**"],
+      presets: [["@babel/env", { shippedProposals: true }]]
+    }),
     babel({ babelHelpers: "bundled", configFile: "./.babelrc.json" }),
     licenseBanner()
   ]
