@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00007 Built on 2024-09-17T13:29:57.860Z
+ * Version 2.5.3-backpatch-00008 Built on 2024-09-17T13:29:57.860Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6887,7 +6887,7 @@ jsPDF.API = {
  * @type {string}
  * @memberof jsPDF#
  */
-jsPDF.version = "2.5.3-backpatch-00007";
+jsPDF.version = "2.5.3-backpatch-00008";
 
 /* global jsPDF */
 
@@ -17066,8 +17066,31 @@ function parseFontFamily(input) {
     // between multiple jsPDF instances
     var jsNamesObj;
     var jsJsObj;
-    var text = javascript;
     
+    // Escape only unescaped parentheses, without double-escaping already escaped ones
+    function escapeParens(str) {
+      let out = "";
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        if (ch === "(" || ch === ")") {
+          // Count preceding backslashes to determine if the paren is already escaped
+          let bs = 0;
+          for (let j = i - 1; j >= 0 && str[j] === "\\"; j--) {
+            bs++;
+          }
+          if (bs % 2 === 0) {
+            out += "\\" + ch;
+          } else {
+            out += ch;
+          }
+        } else {
+          out += ch;
+        }
+      }
+      return out;
+    }
+    var text = escapeParens(javascript);
+
     this.internal.events.subscribe("postPutResources", function() {
       jsNamesObj = this.internal.newObject();
       this.internal.out("<<");
@@ -17078,10 +17101,12 @@ function parseFontFamily(input) {
       jsJsObj = this.internal.newObject();
       this.internal.out("<<");
       this.internal.out("/S /JavaScript");
+      // The sanitized 'text' is now safe to be enclosed in parentheses
       this.internal.out("/JS (" + text + ")");
       this.internal.out(">>");
       this.internal.out("endobj");
     });
+
     this.internal.events.subscribe("putCatalog", function() {
       if (jsNamesObj !== undefined && jsJsObj !== undefined) {
         this.internal.out("/Names <</JavaScript " + jsNamesObj + " 0 R>>");
