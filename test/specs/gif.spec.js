@@ -19,4 +19,15 @@ describe("Module: GIFSupport", () => {
 
     comparePdf(doc.output(), "gif.pdf", "addimage");
   });
+
+  it("rejects a frame larger than 512M pixels", () => {
+    // 1x1 screen, one 65535x8193 frame (just over 512M pixels), all transparent
+    var bigFrameGif =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAD//wEgAAICRAEAOw==";
+
+    const doc = new jsPDF();
+    expect(() => {
+      doc.addImage(bigFrameGif, "GIF89A", 0, 0, 10, 10);
+    }).toThrowError("Image dimensions exceed 512MB, which is too large.");
+  });
 });
