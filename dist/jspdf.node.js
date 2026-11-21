@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00005 Built on 2024-09-17T13:29:57.860Z
+ * Version 2.5.3-backpatch-00006 Built on 2024-09-17T13:29:57.860Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6887,7 +6887,7 @@ jsPDF.API = {
  * @type {string}
  * @memberof jsPDF#
  */
-jsPDF.version = "2.5.3-backpatch-00005";
+jsPDF.version = "2.5.3-backpatch-00006";
 
 /* global jsPDF */
 
@@ -6905,6 +6905,23 @@ var pdfUnescape = function(value) {
     .replace(/\\\\/g, "\\")
     .replace(/\\\(/g, "(")
     .replace(/\\\)/g, ")");
+};
+
+/**
+ * Escapes a PDF Name Object.
+ * Replaces special characters (delimiter, whitespace, #) with their hex representation.
+ */
+var pdfEscapeName = function(value) {
+  return value
+    .toString()
+    .replace(/#/g, "#23")
+    .replace(/[\s\n\r()<>[\]{}\/%]/g, c => {
+      const hex = c
+        .charCodeAt(0)
+        .toString(16)
+        .toUpperCase();
+      return "#" + (hex.length === 1 ? "0" + hex : hex);
+    });
 };
 
 var f2 = function(number) {
@@ -7619,12 +7636,12 @@ var arrayToPdfArray = (jsPDFAPI.__acroform__.arrayToPdfArray = function(
           content += array[i].toString();
           break;
         case "string":
-          if (array[i].substr(0, 1) !== "/") {
+          if (array[i].substr(0, 1) === "/") {
+            content += "/" + pdfEscapeName(array[i].substr(1));
+          } else {
             if (typeof objId !== "undefined" && scope)
               encryptor = scope.internal.getEncryptor(objId);
             content += "(" + pdfEscape(encryptor(array[i].toString())) + ")";
-          } else {
-            content += array[i].toString();
           }
           break;
       }
@@ -7636,6 +7653,7 @@ var arrayToPdfArray = (jsPDFAPI.__acroform__.arrayToPdfArray = function(
     "Invalid argument passed to jsPDF.__acroform__.arrayToPdfArray"
   );
 });
+
 function getMatches(string, regex, index) {
   index || (index = 1); // default to the first capturing group
   var matches = [];
@@ -8271,7 +8289,7 @@ var AcroFormField = function() {
     set: function(value) {
       value = value.toString();
       if (this instanceof AcroFormButton === true) {
-        _DV = "/" + value;
+        _DV = "/" + pdfEscapeName(value);
       } else {
         _DV = value;
       }
@@ -8338,7 +8356,7 @@ var AcroFormField = function() {
     set: function(value) {
       value = value.toString();
       if (this instanceof AcroFormButton === true) {
-        _V = "/" + value;
+        _V = "/" + pdfEscapeName(value);
       } else {
         _V = value;
       }
@@ -9019,7 +9037,7 @@ var AcroFormButton = function() {
       return _AS.substr(1, _AS.length - 1);
     },
     set: function(value) {
-      _AS = "/" + value;
+      _AS = "/" + pdfEscapeName(value);
     }
   });
 };
