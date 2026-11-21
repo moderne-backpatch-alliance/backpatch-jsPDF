@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00004 Built on 2024-09-17T13:29:57.859Z
+ * Version 2.5.3-backpatch-00005 Built on 2024-09-17T13:29:57.859Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6676,7 +6676,7 @@ jsPDF.API = {
  * @memberof jsPDF#
  */
 
-jsPDF.version = "2.5.3-backpatch-00004";
+jsPDF.version = "2.5.3-backpatch-00005";
 
 var jsPDFAPI = jsPDF.API;
 var scaleFactor = 1;
@@ -10241,6 +10241,8 @@ var AcroForm = jsPDF.AcroForm;
    * @param {string} alias alias of the image (if used multiple times)
    * @param {string} compression compression of the generated JPEG, can have the values 'NONE', 'FAST', 'MEDIUM' and 'SLOW'
    * @param {number} rotation rotation of the image in degrees (0-359)
+   *
+   * @throws {Error} if the input is invalid, such as invalid image data.
    *
    * @returns jsPDF
    */
@@ -17984,11 +17986,16 @@ BmpDecoder.prototype.parseHeader = function () {
 
 BmpDecoder.prototype.parseBGR = function () {
   this.pos = this.offset;
+  var bitn = "bit" + this.bitPP;
+  var len = this.width * this.height * 4;
+
+  if (len > 512 * 1024 * 1024) {
+    throw new Error("Image dimensions exceed 512MB, which is too large.");
+  }
+
+  this.data = new Uint8Array(len);
 
   try {
-    var bitn = "bit" + this.bitPP;
-    var len = this.width * this.height * 4;
-    this.data = new Uint8Array(len);
     this[bitn]();
   } catch (e) {
     console.log("bit decode error:" + e);
