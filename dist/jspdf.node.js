@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00006 Built on 2024-09-17T13:29:57.860Z
+ * Version 2.5.3-backpatch-00007 Built on 2024-09-17T13:29:57.860Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6887,7 +6887,7 @@ jsPDF.API = {
  * @type {string}
  * @memberof jsPDF#
  */
-jsPDF.version = "2.5.3-backpatch-00006";
+jsPDF.version = "2.5.3-backpatch-00007";
 
 /* global jsPDF */
 
@@ -18236,6 +18236,11 @@ function GifReader(buf) {
   this.decodeAndBlitFrameBGRA = function(frame_num, pixels) {
     var frame = this.frameInfo(frame_num);
     var num_pixels = frame.width * frame.height;
+
+    if (num_pixels > 512 * 1024 * 1024) {
+      throw new Error("Image dimensions exceed 512MB, which is too large.");
+    }
+
     var index_stream = new Uint8Array(num_pixels); // At most 8-bit indices.
     GifReaderLZWOutputIndexStream(
       buf,
@@ -18308,6 +18313,11 @@ function GifReader(buf) {
   this.decodeAndBlitFrameRGBA = function(frame_num, pixels) {
     var frame = this.frameInfo(frame_num);
     var num_pixels = frame.width * frame.height;
+
+    if (num_pixels > 512 * 1024 * 1024) {
+      throw new Error("Image dimensions exceed 512MB, which is too large.");
+    }
+
     var index_stream = new Uint8Array(num_pixels); // At most 8-bit indices.
     GifReaderLZWOutputIndexStream(
       buf,
