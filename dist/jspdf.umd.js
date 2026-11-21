@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.2 Built on 2024-09-17T13:29:57.856Z
+ * Version 2.5.3-backpatch-00001 Built on 2024-09-17T13:29:57.856Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6698,7 +6698,7 @@
    * @memberof jsPDF#
    */
 
-  jsPDF.version = "2.5.2";
+  jsPDF.version = "2.5.3-backpatch-00001";
 
   var jsPDFAPI = jsPDF.API;
   var scaleFactor = 1;
@@ -10133,32 +10133,36 @@
      * @name extractImageFromDataUrl
      * @function
      * @param {string} dataUrl a valid data URI of format 'data:[<MIME-type>][;base64],<data>'
-     * @returns {Array}an Array containing the following
-     * [0] the complete data URI
-     * [1] <MIME-type>
-     * [2] format - the second part of the mime-type i.e 'png' in 'image/png'
-     * [4] <data>
+     * @returns {string} The raw Base64-encoded data.
      */
 
 
     var extractImageFromDataUrl = jsPDFAPI.__addimage__.extractImageFromDataUrl = function (dataUrl) {
-      dataUrl = dataUrl || "";
-      var dataUrlParts = dataUrl.split("base64,");
-      var result = null;
+      if (dataUrl == null) {
+        return null;
+      } // avoid using a regexp for parsing because it might be vulnerable against ReDoS attacks
 
-      if (dataUrlParts.length === 2) {
-        var extractedInfo = /^data:(\w*\/\w*);*(charset=(?!charset=)[\w=-]*)*;*$/.exec(dataUrlParts[0]);
 
-        if (Array.isArray(extractedInfo)) {
-          result = {
-            mimeType: extractedInfo[1],
-            charset: extractedInfo[2],
-            data: dataUrlParts[1]
-          };
-        }
+      dataUrl = dataUrl.trim(); // substring/slice instead of startsWith/endsWith: IE 11 is a target of this
+      // line and its polyfills (src/polyfills.js) do not cover those methods.
+
+      if (dataUrl.substring(0, 5) !== "data:") {
+        return null;
       }
 
-      return result;
+      var commaIndex = dataUrl.indexOf(",");
+
+      if (commaIndex < 0) {
+        return null;
+      }
+
+      var dataScheme = dataUrl.substring(0, commaIndex).trim();
+
+      if (dataScheme.slice(-6) !== "base64") {
+        return null;
+      }
+
+      return dataUrl.substring(commaIndex + 1);
     };
     /**
      * Check to see if ArrayBuffer is supported
@@ -10393,13 +10397,13 @@
 
     var convertBase64ToBinaryString = jsPDFAPI.__addimage__.convertBase64ToBinaryString = function (stringData, throwError) {
       throwError = typeof throwError === "boolean" ? throwError : true;
-      var base64Info;
       var imageData = "";
       var rawData;
 
       if (typeof stringData === "string") {
-        base64Info = extractImageFromDataUrl(stringData);
-        rawData = base64Info !== null ? base64Info.data : stringData;
+        var _extractImageFromData;
+
+        rawData = (_extractImageFromData = extractImageFromDataUrl(stringData)) !== null && _extractImageFromData !== void 0 ? _extractImageFromData : stringData;
 
         try {
           imageData = atob(rawData);
