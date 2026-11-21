@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 2.5.3-backpatch-00011
+release: 2.5.3-backpatch-00012
 baseline: v2.5.2+backpatch.baseline
 fixes:
   - cve: CVE-2025-29907
@@ -90,12 +90,20 @@ fixes:
     basis: backport
     artifacts:
       - jspdf
-    note: "New in this release; upstream's fix in 4.2.1. It closes the advisory: jsPDF has HTML Injection in New Window paths."
+    note: "Carried from 2.5.3-backpatch-00011; upstream's fix in 4.2.1. It closes the advisory: jsPDF has HTML Injection in New Window paths."
+  - cve: CVE-2025-68428
+    upstream_fix_url: https://github.com/parallax/jsPDF/commit/a688c8f479929b24a6543b1fa2d6364abb03066d
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2025-68428
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-jsPDF/compare/e6b1dfd~1...3b61329
+    basis: backport
+    artifacts:
+      - jspdf
+    note: "New in this release; upstream's fix in 4.0.0. It closes the advisory: jsPDF has Local File Inclusion/Path Traversal vulnerability. Under Node, the node build's file loading now refuses to read a file by default, as upstream's 4.0.0 does: loadFile, and with it addFont with a file path and addImage with a file path, throws unless Node runs with --permission and grants the read, or jsPDF.allowFsRead lists the file (an exact path or a prefix ending in *). An application that loads fonts or images from disk on this line fails until it sets allowFsRead or runs Node with --permission. Browser builds are unchanged."
 tests:
-  commit: 7169f504d9ca7e48ade9cdb0d0e8b7896e91d78e
+  commit: 3b61329a290e9b8b847162fddc82ddd951770eb9
   command: npm ci at the commit's lockfile, rollup --config rollup.config.js (dist/ equals the commit's), npm pack --ignore-scripts, npm install of the tarball into an empty consumer, then jasmine --config=test/deployment/node/jasmine.json with the tested commit's test/ and loadGlobals taking jsPDF from require('jspdf'), one JUnit testcase per spec
   runtime: Node.js v20.20.2 and npm 10.8.2 (build), Node.js v22.16.0 (suite), rollup 2.21.0, jasmine 3.5.0, macOS 27.2 arm64
-  report: jspdf-2.5.3-backpatch-00011-tests.zip
-  report_sha256: 5b5718d6e6f1a23d49cc8c6de6d8365452ab0968d9e4c906e712536eb4814af4
+  report: jspdf-2.5.3-backpatch-00012-tests.zip
+  report_sha256: e3c7ed818c368a646ebff039d91b8c1891783e4d94e50cbbec6f70dba55edb97
   result: pass
-  note: "upstream's jasmine node suite (test/deployment/node/jasmine.json, every spec file) through the main entry (dist/jspdf.node.min.js) of the packed package installed into a consumer, jsPDF.version set to the baseline's 2.5.2 by a helper outside the repo since the reference PDFs' xref offsets assume a five-character version in /Producer at the tested commit: 462 tests, 458 passed, 0 failed, 4 skipped. The CVE tests (test/specs/init.spec.js), with this release's production lines reverted at the tested commit: 29 tests, 2 passed, 5 failed, 22 skipped, test files exiting non-zero: jasmine; with them: 29 tests, 7 passed, 0 failed, 22 skipped. Built with rollup (rollup.config.js) on Node.js v20.20.2 with npmjs 2.5.2's banner stamps and CRLF on src/jspdf.js and src/modules/context2d.js in a directory named jspdf, 2 of npmjs's 18 files for 2.5.2 are identical; the rest are dist/jspdf.es.js, dist/jspdf.es.js.map, dist/jspdf.es.min.js, dist/jspdf.es.min.js.map, dist/jspdf.node.js, dist/jspdf.node.js.map, dist/jspdf.node.min.js, dist/jspdf.node.min.js.map, dist/jspdf.umd.js, dist/jspdf.umd.js.map, dist/jspdf.umd.min.js, dist/jspdf.umd.min.js.map, dist/polyfills.es.js, dist/polyfills.umd.js, package.json, types/index.d.ts. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
+  note: "upstream's jasmine node suite (test/deployment/node/jasmine.json, every spec file) through the main entry (dist/jspdf.node.min.js) of the packed package installed into a consumer, jsPDF.version set to the baseline's 2.5.2 by a helper outside the repo since the reference PDFs' xref offsets assume a five-character version in /Producer at the tested commit: 470 tests, 466 passed, 0 failed, 4 skipped. The CVE tests (test/specs/fileloading.spec.js test/specs/text.spec.js test/specs/ttfsupport.spec.js), with this release's production lines reverted at the tested commit: 35 tests, 32 passed, 3 failed, 0 skipped, test files exiting non-zero: jasmine; with them: 35 tests, 35 passed, 0 failed, 0 skipped. Built with rollup (rollup.config.js) on Node.js v20.20.2 with npmjs 2.5.2's banner stamps and CRLF on src/jspdf.js and src/modules/context2d.js in a directory named jspdf, 1 of npmjs's 18 files for 2.5.2 are identical; the rest are README.md, dist/jspdf.es.js, dist/jspdf.es.js.map, dist/jspdf.es.min.js, dist/jspdf.es.min.js.map, dist/jspdf.node.js, dist/jspdf.node.js.map, dist/jspdf.node.min.js, dist/jspdf.node.min.js.map, dist/jspdf.umd.js, dist/jspdf.umd.js.map, dist/jspdf.umd.min.js, dist/jspdf.umd.min.js.map, dist/polyfills.es.js, dist/polyfills.umd.js, package.json, types/index.d.ts. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
