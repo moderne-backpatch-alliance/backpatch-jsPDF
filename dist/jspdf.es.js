@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00011 Built on 2024-09-17T13:29:57.859Z
+ * Version 2.5.3-backpatch-00012 Built on 2024-09-17T13:29:57.859Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6731,7 +6731,7 @@ jsPDF.API = {
  * @memberof jsPDF#
  */
 
-jsPDF.version = "2.5.3-backpatch-00011";
+jsPDF.version = "2.5.3-backpatch-00012";
 
 var jsPDFAPI = jsPDF.API;
 var scaleFactor = 1;
@@ -14853,10 +14853,44 @@ function parseFontFamily(input) {
    * @param {function} callback
    * @returns {string|undefined} result
    */
-
   jsPDFAPI.loadFile = function (url, sync, callback) {
     return browserRequest(url, sync, callback);
   };
+  /**
+   * @name allowFsRead
+   * @property
+   * @type {string[]|undefined}
+   *
+   * Controls which local files may be read by jsPDF when running under Node.js.
+   *
+   * Security recommendation:
+   * - We strongly recommend using Node's permission flags (`node --permission --allow-fs-read=...`) instead of this property,
+   *   especially in production. The Node flags are enforced by the runtime and provide stronger guarantees.
+   *
+   * Behavior:
+   * - When present, jsPDF will allow reading only if the requested, resolved absolute path matches any entry in this array.
+   * - Each entry can be either:
+   *   - An absolute or relative file path for an exact match, or
+   *   - A prefix ending with a single wildcard `*` to allow all paths starting with that prefix.
+   * - Examples of allowed patterns:
+   *   - `"./fonts/MyFont.ttf"` (exact match by resolved path)
+   *   - `"/abs/path/to/file.txt"` (exact absolute path)
+   *   - `"./assets/*"` (any file whose resolved path starts with the resolved `./assets/` directory)
+   *
+   * Notes:
+   * - If Node's permission API is available (`process.permission`), it is checked first. If it denies access, reading will fail regardless of `allowFsRead`.
+   * - If neither `process.permission` nor `allowFsRead` is set, reading from the local file system is disabled and an error is thrown.
+   *
+   * Example:
+   * ```js
+   * const doc = jsPDF();
+   * doc.allowFsRead = ["./fonts/*", "./images/logo.png"]; // allow everything under ./fonts and a single file
+   * const ttf = doc.loadFile("./fonts/MyFont.ttf", true);
+   * ```
+   */
+
+
+  jsPDFAPI.allowFsRead = undefined;
   /**
    * @name loadImageFile
    * @function
@@ -14864,7 +14898,6 @@ function parseFontFamily(input) {
    * @param {boolean} sync
    * @param {function} callback
    */
-
 
   jsPDFAPI.loadImageFile = jsPDFAPI.loadFile;
 
