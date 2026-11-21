@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00002 Built on 2024-09-17T13:29:57.856Z
+ * Version 2.5.3-backpatch-00003 Built on 2024-09-17T13:29:57.856Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6865,7 +6865,7 @@
    * @memberof jsPDF#
    */
 
-  jsPDF.version = "2.5.3-backpatch-00002";
+  jsPDF.version = "2.5.3-backpatch-00003";
 
   var jsPDFAPI = jsPDF.API;
   var scaleFactor = 1;
@@ -16725,8 +16725,6 @@
    */
 
   (function (jsPDFAPI) {
-
-    var jsNamesObj, jsJsObj, text;
     /**
      * @name addJS
      * @function
@@ -16735,7 +16733,11 @@
      */
 
     jsPDFAPI.addJS = function (javascript) {
-      text = javascript;
+      // FIX: Move variables inside function scope to prevent shared state
+      // between multiple jsPDF instances
+      var jsNamesObj;
+      var jsJsObj;
+      var text = javascript;
       this.internal.events.subscribe("postPutResources", function () {
         jsNamesObj = this.internal.newObject();
         this.internal.out("<<");
