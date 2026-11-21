@@ -1,7 +1,7 @@
 /** @license
  *
  * jsPDF - PDF Document creation from JavaScript
- * Version 2.5.3-backpatch-00008 Built on 2024-09-17T13:29:57.859Z
+ * Version 2.5.3-backpatch-00009 Built on 2024-09-17T13:29:57.859Z
  *                      CommitID 00000000
  *
  * Copyright (c) 2010-2021 James Hall <james@parall.ax>, https://github.com/MrRio/jsPDF
@@ -6676,7 +6676,7 @@ jsPDF.API = {
  * @memberof jsPDF#
  */
 
-jsPDF.version = "2.5.3-backpatch-00008";
+jsPDF.version = "2.5.3-backpatch-00009";
 
 var jsPDFAPI = jsPDF.API;
 var scaleFactor = 1;
@@ -8740,7 +8740,13 @@ var AcroFormButton = function AcroFormButton() {
       return _AS;
     },
     set: function set(value) {
-      _AS = value;
+      var name = value === undefined || value === null ? "" : value.toString();
+
+      if (name.substr(0, 1) === "/") {
+        name = name.substr(1);
+      }
+
+      _AS = "/" + pdfEscapeName(name);
     }
   });
   /**
@@ -8900,7 +8906,13 @@ var AcroFormChildClass = function AcroFormChildClass() {
       return _AS;
     },
     set: function set(value) {
-      _AS = value;
+      var name = value === undefined || value === null ? "" : value.toString();
+
+      if (name.substr(0, 1) === "/") {
+        name = name.substr(1);
+      }
+
+      _AS = "/" + pdfEscapeName(name);
     }
   });
   /**
@@ -8917,7 +8929,13 @@ var AcroFormChildClass = function AcroFormChildClass() {
       return _AS.substr(1, _AS.length - 1);
     },
     set: function set(value) {
-      _AS = "/" + value;
+      var name = value === undefined || value === null ? "" : value.toString();
+
+      if (name.substr(0, 1) === "/") {
+        name = name.substr(1);
+      }
+
+      _AS = "/" + pdfEscapeName(name);
     }
   });
   this.caption = "l";
