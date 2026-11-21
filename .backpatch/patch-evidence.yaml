@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 2.5.3-backpatch-00001
+release: 2.5.3-backpatch-00002
 baseline: v2.5.2+backpatch.baseline
 fixes:
   - cve: CVE-2025-29907
@@ -10,12 +10,20 @@ fixes:
     basis: adapted
     artifacts:
       - jspdf
-    note: "New in this release; upstream's fix in 3.0.1, adapted to 2.5.2. It closes the advisory: jsPDF Bypass Regular Expression Denial of Service (ReDoS)."
+    note: "Carried from 2.5.3-backpatch-00001; upstream's fix in 3.0.1, adapted to 2.5.2. It closes the advisory: jsPDF Bypass Regular Expression Denial of Service (ReDoS)."
+  - cve: CVE-2025-57810
+    upstream_fix_url: https://github.com/parallax/jsPDF/commit/4cf3ab619e565d9b88b4b130bff901b91d8688e9
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2025-57810
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-jsPDF/compare/9b8f5c4~1...f746624
+    basis: adapted
+    artifacts:
+      - jspdf
+    note: "New in this release; upstream's fix in 3.0.2 (4cf3ab6, 9ea590c), adapted to 2.5.2. It closes the advisory: jsPDF Denial of Service (DoS)."
 tests:
-  commit: c76b19adfed49e15ea785b42cd72ce2eb9db1b38
+  commit: f746624e9e149286ec1d44c4a766bbd6d5da0015
   command: npm ci at the commit's lockfile, rollup --config rollup.config.js (dist/ equals the commit's), npm pack --ignore-scripts, npm install of the tarball into an empty consumer, then jasmine --config=test/deployment/node/jasmine.json with the tested commit's test/ and loadGlobals taking jsPDF from require('jspdf'), one JUnit testcase per spec
   runtime: Node.js v20.20.2 and npm 10.8.2 (build), Node.js v22.16.0 (suite), rollup 2.21.0, jasmine 3.5.0, macOS 27.2 arm64
-  report: jspdf-2.5.3-backpatch-00001-tests.zip
-  report_sha256: 87bd7187d5ca09508936dcee11553e8a42eb54ebce7554d392ae33aaa92b53e2
+  report: jspdf-2.5.3-backpatch-00002-tests.zip
+  report_sha256: 9dec3197c9f0eba1c36f894cdd9d6097c3167867295d580c3882af817ea71a9b
   result: pass
-  note: "upstream's jasmine node suite (test/deployment/node/jasmine.json, every spec file) through the main entry (dist/jspdf.node.min.js) of the packed package installed into a consumer, jsPDF.version set to the baseline's 2.5.2 by a helper outside the repo since the reference PDFs' xref offsets assume a five-character version in /Producer at the tested commit: 422 tests, 417 passed, 0 failed, 5 skipped. The CVE tests (test/specs/base64.spec.js), with this release's production lines reverted at the tested commit: 2 tests, 1 passed, 1 failed, 0 skipped, test files exiting non-zero: jasmine; with them: 2 tests, 2 passed, 0 failed, 0 skipped. Built with rollup (rollup.config.js) on Node.js v20.20.2 with npmjs 2.5.2's banner stamps and CRLF on src/jspdf.js and src/modules/context2d.js in a directory named jspdf, 3 of npmjs's 18 files for 2.5.2 are identical; the rest are dist/jspdf.es.js, dist/jspdf.es.js.map, dist/jspdf.es.min.js, dist/jspdf.es.min.js.map, dist/jspdf.node.js, dist/jspdf.node.js.map, dist/jspdf.node.min.js, dist/jspdf.node.min.js.map, dist/jspdf.umd.js, dist/jspdf.umd.js.map, dist/jspdf.umd.min.js, dist/jspdf.umd.min.js.map, dist/polyfills.es.js, dist/polyfills.umd.js, package.json. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
+  note: "upstream's jasmine node suite (test/deployment/node/jasmine.json, every spec file) through the main entry (dist/jspdf.node.min.js) of the packed package installed into a consumer, jsPDF.version set to the baseline's 2.5.2 by a helper outside the repo since the reference PDFs' xref offsets assume a five-character version in /Producer at the tested commit: 444 tests, 440 passed, 0 failed, 4 skipped. The CVE tests (test/specs/png_crc.spec.js), with this release's production lines reverted at the tested commit: 2 tests, 1 passed, 1 failed, 0 skipped, test files exiting non-zero: jasmine; with them: 2 tests, 2 passed, 0 failed, 0 skipped. Built with rollup (rollup.config.js) on Node.js v20.20.2 with npmjs 2.5.2's banner stamps and CRLF on src/jspdf.js and src/modules/context2d.js in a directory named jspdf, 3 of npmjs's 18 files for 2.5.2 are identical; the rest are dist/jspdf.es.js, dist/jspdf.es.js.map, dist/jspdf.es.min.js, dist/jspdf.es.min.js.map, dist/jspdf.node.js, dist/jspdf.node.js.map, dist/jspdf.node.min.js, dist/jspdf.node.min.js.map, dist/jspdf.umd.js, dist/jspdf.umd.js.map, dist/jspdf.umd.min.js, dist/jspdf.umd.min.js.map, dist/polyfills.es.js, dist/polyfills.umd.js, package.json. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
